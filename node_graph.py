@@ -2,8 +2,12 @@ class Node:
     def __init__(self, name: str):
         self.name = name
         self.adjacency_info = []  # only written when constructing the graph with __init__ method of WeightedMultigraph
-        self.parent = []  # only written by pathfinding algorithm, should be a list of [node, path_number, edge_cost]
-        self.f_cost = None  # This might be different for different algorithms, so only written by them as well
+        self.parent = []  # only written by pathfinding algorithm, should be a list of [node, edge_index, edge_cost]
+
+        # These might be different for different algorithms, so only written by them as well
+        self.f_cost = None
+        self.g_cost = None
+        self.h_cost = None
 
 
 class WeightedMultiGraph:
@@ -46,8 +50,8 @@ class WeightedMultiGraph:
         if adjacent_nodes is not None and edge_costs is not None:
             for adjacent_node, edge_cost in zip(adjacent_nodes, edge_costs):
                 node_edge_count += 1
-                print("The adjacent node is: {}\n".format(adjacent_node.name),
-                      "The edge cost is: {}\n".format(edge_cost))
+                # print("The adjacent node is: {}\n".format(adjacent_node.name),
+                #       "The edge cost is: {}\n".format(edge_cost))
                 if adjacent_node.name == current_node.name:
                     raise ValueError("We assumed no self-looping nodes as it is not useful in pathfinding.")
 
@@ -62,12 +66,12 @@ class WeightedMultiGraph:
                 if self.graph_type == "directed":  # add the edge back if is a directed graph
                     # record the adjacent nodes' info to be put into node.adjacency_info
                     #   note the node instance can be accessed through self.nodes[node.name]
-                    adjacency_info.append({"adjacent node name": adjacent_node.name,
+                    adjacency_info.append({"node name": adjacent_node.name,
                                            "edge index": edge_index,
                                            "edge cost": edge_cost})
 
                     # add this node back to the adjacent node's attribute; the edge index should be the same
-                    self.nodes[adjacent_node.name].adjacency_info.append({"adjacent node name": current_node.name,
+                    self.nodes[adjacent_node.name].adjacency_info.append({"node name": current_node.name,
                                                                           "edge index": edge_index,
                                                                           "edge cost": edge_cost})
 
@@ -83,3 +87,5 @@ class MultiGraph(WeightedMultiGraph):
     # Just a special case where it has uniform cost, so it is a subclass
 
     pass
+
+#%%
