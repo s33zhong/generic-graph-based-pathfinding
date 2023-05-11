@@ -17,12 +17,36 @@ class PathfindingAlgorithm:
             path.append(current_node)
         return path
 
-    def expand_node(self, current_node, closed_list, open_list):
-        closed_list.append(current_node)  # the current node gets pushed to the closed list
-
+    @staticmethod
+    def expand_node(graph, current_node, closed_list, open_list):
+        closed_list.append_node(current_node)  # the current node gets pushed to the closed list
+        open_list.remove_node(current_node)
+        if not current_node.adjacency_info:
+            for adjacent_node in current_node.adjacency_info:
+                open_list.append(graph.nodes[adjacent_node.name])
 
 
 class AStar(PathfindingAlgorithm):
     pass
 
-#%%
+
+class BreathFirstSearch:
+    pass
+
+
+class SearchOrder:
+    def __init__(self, search_type="queue"):
+        self.search_type = search_type
+        self.ordered_list = []
+
+    def put(self, node):
+        if self.search_type == "queue":
+            self.ordered_list.append(node)
+        elif self.search_type == "stack":
+            self.ordered_list.append(node)
+
+    def get(self, node):
+        if self.search_type == "queue":
+            return self.ordered_list.popleft()
+        elif self.search_type == "stack":
+            self.ordered_list.pop
