@@ -36,16 +36,18 @@ class OpenList:
                 result = heapq.heappop(self.node_names)[1]
         return result
 
-    def add_node(self, closed_list, node_name, priority=0):
+    def add_node(self, closed_list, node_name, cost=0):
         if closed_list.exist(node_name):  # node already exists
             return False
         else:
-            if self.list_type == "priority_queue":
-                heapq.heappush(self.node_names, (priority, node_name))
-            elif self.list_type in {"queue", "stack"}:
+            if self.list_type in {"queue", "stack"}:
                 self.node_names.append(node_name)  # attach to the right
                 self.record.append(node_name)
-            return True
+                return True
+            elif self.list_type == "priority_queue":
+                heapq.heappush(self.node_names, (cost, node_name))
+                self.record.append(node_name)
+                return True
 
     def empty(self):
         return not self.node_names
@@ -115,9 +117,35 @@ class BreathFirstSearch(PathfindingAlgorithm):
 
 class DijkstraSearch(PathfindingAlgorithm):
     def find_path(self, graph, start_node, end_node, order='reversed'):
-        open_list = OpenList(list_type="priority_queue")  # BreathFirstSearch implements a queue
+        open_list = OpenList(list_type="priority_queue")  # Dijkstra's Algorithm may expand a node more than once
         closed_list = ClosedList()
-        open_list.add_node(closed_list=closed_list, node_name=start_node.name)
-        # while not open_list.empty():
+        open_list.add_node(closed_list=closed_list, node_name=start_node.name, cost=0)
+        while not open_list.empty():
+            current_node = graph.nodes[open_list.pop_node()]  # get the current node! first iter is the start node
+            # print("Current node is: {} & the end node is: {}".format(current_node.name, end_node.name))
+            if current_node.name in closed_list.node_names:
+                pass
+            if current_node.name == end_node.name:
+                return self.return_path(start_node=start_node, end_node=end_node, order=order)
+            closed_list.add_node(current_node.name)
+            self.expand_node(graph=graph, closed_list=closed_list,
+                             open_list=open_list, current_node=current_node)
+        return -1
+
+    def expand_node(self, graph, closed_list, open_list, current_node):
+        for entry in current_node.adjacency_info:
+
+            open_list.add_node(closed_list=closed_list,
+                               node_name=entry['node name'],
+                               cost=current_node.optimal_cost + entry['edge cost'])
 
 
+class Heuristic:
+    def __init__(self):
+        pass
+
+    def metric(self):
+        pass
+
+    def calculate(self, current_node, next_node):
+        return self.metric(current_node, next_node)
