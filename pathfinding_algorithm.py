@@ -1,4 +1,5 @@
 import collections
+import heapq
 
 
 # We only store node names in the node lists, to save memory, as accessing Node.nodes dict (hash table) is only O(1)
@@ -31,14 +32,19 @@ class OpenList:
                 result = self.node_names.popleft()
             elif self.list_type == "stack":
                 result = self.node_names.pop()
+            elif self.list_type == "priority_queue":
+                result = heapq.heappop(self.node_names)[1]
         return result
 
-    def add_node(self, closed_list, node_name):
+    def add_node(self, closed_list, node_name, priority=0):
         if closed_list.exist(node_name):  # node already exists
             return False
         else:
-            self.node_names.append(node_name)  # attach to the right
-            self.record.append(node_name)
+            if self.list_type == "priority_queue":
+                heapq.heappush(self.node_names, (priority, node_name))
+            elif self.list_type in {"queue", "stack"}:
+                self.node_names.append(node_name)  # attach to the right
+                self.record.append(node_name)
             return True
 
     def empty(self):
@@ -77,6 +83,14 @@ class PathfindingAlgorithm:
 class BreathFirstSearch(PathfindingAlgorithm):
 
     def find_path(self, graph, start_node, end_node, order='reversed'):
+        """
+        Implements a BFS algorithm that does not care about optimal cost (just for practice purposes)
+        :param graph:           a WeightedMultigraph instance
+        :param start_node:      a Node instance, where we are starting
+        :param end_node:        a Node instance, our goal
+        :param order:           the path with node names, takes on either 'forward' or 'reversed'
+        :return:
+        """
         open_list = OpenList(list_type="queue")  # BreathFirstSearch implements a queue
         closed_list = ClosedList()
         open_list.add_node(closed_list=closed_list, node_name=start_node.name)
@@ -100,4 +114,10 @@ class BreathFirstSearch(PathfindingAlgorithm):
 
 
 class DijkstraSearch(PathfindingAlgorithm):
-    pass
+    def find_path(self, graph, start_node, end_node, order='reversed'):
+        open_list = OpenList(list_type="priority_queue")  # BreathFirstSearch implements a queue
+        closed_list = ClosedList()
+        open_list.add_node(closed_list=closed_list, node_name=start_node.name)
+        # while not open_list.empty():
+
+

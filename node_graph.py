@@ -2,7 +2,7 @@ class Node:
     def __init__(self, name: str):
         self.name = name
         self.adjacency_info = []  # only written when constructing the graph with __init__ method of WeightedMultigraph
-        self.parent = []  # only written by pathfinding algorithm, should be a list of [node, edge_index, edge_cost]
+        self.parent = []  # only written by pathfinding algorithm; a list of [parent_node, edge_index, edge_cost]
 
         # These might be different for different algorithms, so only written by them as well
         self.f_cost = None
